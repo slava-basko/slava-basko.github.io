@@ -63,3 +63,6 @@ minima:
     - title: LinkedIn
       icon: linkedin
       url: "https://www.linkedin.com/in/slava-basko/"
+
+# Google Analytics
+google_analytics: G-QYT56TXX6B
