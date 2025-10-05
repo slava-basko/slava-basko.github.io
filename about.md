@@ -14,8 +14,11 @@ The main areas of experience are gambling, advertising, analytics, and logistics
 
 {:style="clear: left"}
 Here is a list of libraries developed by me and used in different projects:
-* [Specification Pattern implementation](https://github.com/slava-basko/specification-php){:target="_blank"}
 * [Dependency Injection Container](https://github.com/slava-basko/container){:target="_blank"}
+* [Specification Pattern implementation](https://github.com/slava-basko/specification-php){:target="_blank"}
+* [Command Bus](https://github.com/slava-basko/bus-php){:target="_blank"}
+* [Saga](https://github.com/slava-basko/saga-php){:target="_blank"}
+* [State Machine](https://github.com/slava-basko/finite-state-machine){:target="_blank"}
 * [Functional programming](https://github.com/slava-basko/functional-php){:target="_blank"}
 
 Drop me an email at [basko.slava@gmail.com](mailto:basko.slava@gmail.com) to contact me.
