@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Specification Pattern | Notes and thoughts</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Specification Pattern" />
+<meta name="author" content="Slava Basko" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Specification Pattern — what it’s about and why we should use it." />
+<meta property="og:description" content="Specification Pattern — what it’s about and why we should use it." />
+<link rel="canonical" href="/2025/03/02/specification-pattern.html" />
+<meta property="og:url" content="/2025/03/02/specification-pattern.html" />
+<meta property="og:site_name" content="Notes and thoughts" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-03-02T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Specification Pattern" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Slava Basko"},"dateModified":"2025-03-02T00:00:00+00:00","datePublished":"2025-03-02T00:00:00+00:00","description":"Specification Pattern — what it’s about and why we should use it.","headline":"Specification Pattern","mainEntityOfPage":{"@type":"WebPage","@id":"/2025/03/02/specification-pattern.html"},"url":"/2025/03/02/specification-pattern.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Notes and thoughts" /><script>
+if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'G-QYT56TXX6B', 'auto');
+  ga('send', 'pageview');
+}
+</script>
+  
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Notes and thoughts</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about.html">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Specification Pattern</h1>
+    <div class="post-meta">
+      <time class="dt-published" datetime="2025-03-02T00:00:00+00:00" itemprop="datePublished">
+        Mar 2, 2025
+      </time>
+        &bullet;
+        
+        <a href="/tag/php.html">#php</a>
+        
+        <a href="/tag/specification.html">#specification</a>
+        
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Specification Pattern — what it’s about and why we should use it.</p>
+
+<p>Not so long ago, I joined a logistics project with quite a legacy codebase. 
+Eventually, we updated the project to PHP 7 and then to PHP 8. 
+That wasn’t a big deal since there were literally no dependencies.</p>
+
+<p>The real struggle was maintaining business rules.
+Basically, a lot of <code class="language-plaintext highlighter-rouge">if {} else {}</code> statements, lists, code duplication, etc.
+These rules weren’t fixed, some rules work fine today, but tomorrow conditions change, and we need to adjust the code.
+For example, today, the EU is one list of countries, but after Brexit, it’s another one.</p>
+
+<p>Things got even messier because we spoke with clients in different languages. 
+They called certain conditions/rules one way, and we called them another. 
+It was clear we needed a common language that both sides could understand.</p>
+
+<p>That’s when I remembered the beautiful and simple <strong>Specification Pattern</strong> — a perfect fit for our problem. 
+Plus, it’s super handy even between developers.</p>
+
+<h2 id="building-a-specification-library">Building a Specification Library</h2>
+
+<p>I wanted to introduce specifications, so I started looking for a good and simple PHP library. 
+Unfortunately, everything I found was either overengineered or didn’t meet our criteria — PHP 5.5 at the time, no dependencies.</p>
+
+<p>So, I built my own, focusing on simplicity, high composability, and avoiding fancy modern PHP features that wouldn’t 
+work on older PHP versions and didn’t bring much benefit anyway.</p>
+
+<p>👉 You can check it out on GitHub: <a href="https://github.com/slava-basko/specification-php">https://github.com/slava-basko/specification-php</a>.</p>
+
+<h2 id="why-use-specifications">Why Use Specifications?</h2>
+
+<p>At first, it might seem like overkill. But trust me, the value becomes clear over time.
+Take a simple example: <strong>Shipment goes to the UK</strong>.
+You could implement a <code class="language-plaintext highlighter-rouge">Shipment::toUK(): bool</code> method, but that quickly becomes messy. You’ll end up with a ton of helper methods cluttering your entity. A better approach is to encapsulate this logic in a specification:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">ShipmentToUk</span> <span class="kd">extends</span> <span class="nc">AbstractSpecification</span> <span class="p">{</span>
+    <span class="cd">/**
+     * @param Shipment $candidate
+     * @return bool
+     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isSatisfiedBy</span><span class="p">(</span><span class="nv">$candidate</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$candidate</span><span class="o">-&gt;</span><span class="nf">getDesctination</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'UK'</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>That worked for a while, but then the client said:</p>
+<blockquote>
+  <p>Well, we consider Jersey and the Isle of Man as part of the UK too.</p>
+</blockquote>
+
+<p>No problem! Just tweak the specification:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">ShipmentToUk</span> <span class="kd">extends</span> <span class="nc">AbstractSpecification</span> <span class="p">{</span>
+    <span class="cd">/**
+     * @param Shipment $candidate
+     * @return bool
+     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isSatisfiedBy</span><span class="p">(</span><span class="nv">$candidate</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">in_array</span><span class="p">(</span><span class="nv">$candidate</span><span class="o">-&gt;</span><span class="nf">getDestination</span><span class="p">(),</span> <span class="p">[</span><span class="s1">'UK'</span><span class="p">,</span> <span class="s1">'GB'</span><span class="p">,</span> <span class="s1">'JE'</span><span class="p">,</span> <span class="s1">'IM'</span><span class="p">]);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Boom! One small change, and it applies everywhere. 
+Plus, now everyone understands what <strong>Shipment goes to the UK</strong> actually means.</p>
+
+<h2 id="composing-specifications">Composing Specifications</h2>
+
+<p>Next, let’s introduce a <strong>High-value UK shipment</strong> specification.
+First, we define a <strong>High-value</strong> specification:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">HighValue</span> <span class="kd">extends</span> <span class="nc">AbstractSpecification</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="k">private</span> <span class="kt">CurrencyConverter</span> <span class="nv">$currencyConverter</span><span class="p">)</span> <span class="p">{}</span>
+
+    <span class="cd">/**
+     * @param Shipment $candidate
+     * @return bool
+     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isSatisfiedBy</span><span class="p">(</span><span class="nv">$candidate</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">currencyConverter</span><span class="o">-&gt;</span><span class="nf">toGBP</span><span class="p">(</span><span class="nv">$candidate</span><span class="o">-&gt;</span><span class="nf">getValue</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">300</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Then, we combine it with <strong>Shipment goes to the UK</strong>:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$highValueUkShipmentSpecification</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">AndSpecification</span><span class="p">([</span>
+    <span class="k">new</span> <span class="nc">ShipmentToUk</span><span class="p">(),</span>
+    <span class="k">new</span> <span class="nc">HighValue</span><span class="p">(</span><span class="k">new</span> <span class="nc">CurrencyConverter</span><span class="p">())</span>
+<span class="p">]);</span>
+</code></pre></div></div>
+
+<h2 id="the-real-benefit">The Real Benefit</h2>
+
+<p>Now, imagine your system is using these specifications everywhere, and the client suddenly says:</p>
+<blockquote>
+  <p>We noticed the system doesn’t recognize Guernsey as part of the UK. We need to fix this.</p>
+</blockquote>
+
+<p>No problem at all! You only need to update <strong>Shipment goes to the UK</strong>:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">return</span> <span class="nb">in_array</span><span class="p">(</span><span class="nv">$candidate</span><span class="o">-&gt;</span><span class="nf">getDestination</span><span class="p">(),</span> <span class="p">[</span><span class="s1">'UK'</span><span class="p">,</span> <span class="s1">'GB'</span><span class="p">,</span> <span class="s1">'JE'</span><span class="p">,</span> <span class="s1">'IM'</span><span class="p">,</span> <span class="s1">'GG'</span><span class="p">]);</span>
+</code></pre></div></div>
+<p>Done! Changes reflected on <strong>Shipment goes to the UK</strong> specification as well on <strong>High-value UK shipment</strong>.</p>
+
+<h2 id="final-thoughts">Final Thoughts</h2>
+
+<p>The Specification Pattern keeps business rules clean, encapsulated, and easy to adjust. 
+No more hunting for messy <code class="language-plaintext highlighter-rouge">if {} else {}</code> statements. 
+Just tweak the relevant spec, and the change propagates across the system.</p>
+
+<p>Give it a try — you’ll thank yourself later. 😎</p>
+
+  </div>
+
+  <a class="u-url" href="/2025/03/02/specification-pattern.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Notes and thoughts</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Slava Basko</li><li><a class="u-email" href="mailto:basko.slava@gmail.com">basko.slava@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/slava-basko"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">slava-basko</span></a></li><li><a href="https://www.linkedin.com/in/slava-basko"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">slava-basko</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>The shelf for notes, thoughts, researches, etc.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
