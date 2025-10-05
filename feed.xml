@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2025-10-05T06:45:11+00:00</updated><id>/feed.xml</id><title type="html">Notes and thoughts</title><subtitle>The shelf for notes, thoughts, researches, etc.</subtitle><author><name>Slava Basko</name></author><entry><title type="html">Functional Programming and PHP</title><link href="/2025/04/10/functional-programming-php.html" rel="alternate" type="text/html" title="Functional Programming and PHP" /><published>2025-04-10T00:00:00+00:00</published><updated>2025-04-10T00:00:00+00:00</updated><id>/2025/04/10/functional-programming-php</id><content type="html" xml:base="/2025/04/10/functional-programming-php.html"><![CDATA[<p>Let’s talk about PHP and functional programming. Why might it be a thing.</p>
+
+<p>I always try to learn something new because this is the part of me. I love learning, it helps brain to be fit. As part of this process, I used to try Go, Python, Java, etc. More or less, they are all about the same.
+It’s like learning Spanish and Italian. They are both Latin, use similar structures, grammar, syntax, etc. You get some profit of knowing both languages, but not the same as you know Latin and Cyrillic, for example.
+Cyrillic is something completely different. This shows how else one can communicate. It opens completely new horizons.</p>
+
+<p>After a little bit of googling, I found functional programming. Eventually, I ended up with Scheme and Haskell, and later primary with Haskell. Ohh, that was a real struggle even in understanding what was going on in a simple Haskell function because this language was exotic to my procedural brain. I believe it is far easier for a newcomer to grasp Haskell than for a someone who get used to writing procedural code.</p>
+
+<p>Today I want to focus not on the specific functional programming language, but on the paradigms, rules, principles from the functional programming, like:</p>
+<ul>
+  <li>Purity</li>
+  <li>Immutability</li>
+  <li>First-Class Functions</li>
+  <li>Composition</li>
+  <li>Currying</li>
+  <li>Declarative Programming</li>
+</ul>
+
+<p>The first three might sound familiar to any modern procedural developer. I will not go thoroughly through all the concepts, but instead, I want to show what they are all about briefly.</p>
+
+<h3 id="purity">Purity</h3>
+
+<p>Function that has <strong>both input and output</strong>, with no <a href="https://en.wikipedia.org/wiki/Side_effect_(computer_science)" target="_blank">side effects</a>.
+Why do I emphasize on both input and output? Because most likely your function has side effects if there is no input or output.</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Pure function</span>
+<span class="k">function</span> <span class="n">concat</span><span class="p">(</span><span class="nv">$separator</span><span class="p">,</span> <span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$a</span> <span class="mf">.</span> <span class="nv">$separator</span> <span class="mf">.</span> <span class="nv">$b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Not pure, because relying on global constant</span>
+<span class="k">function</span> <span class="n">concat</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$a</span> <span class="mf">.</span> <span class="no">DEFAULT_SEPAEATOR</span> <span class="mf">.</span> <span class="nv">$b</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Pure functions are much easier to test. You don’t need to mock anything! You pass arguments, you get the result.
+Pure functions are predictable and straightforward.</p>
+
+<h3 id="immutability">Immutability</h3>
+<p>Data, once created, cannot be changed. Instead of modifying existing data, new data is created based on the old data.
+We don’t need to do anything special in most cases to stick this rule because <code class="language-plaintext highlighter-rouge">passed by value</code> is a default PHP behavior.
+Except <a href="https://www.php.net/manual/en/functions.arguments.php#functions.arguments.by-reference" target="_blank">objects</a>, they a <code class="language-plaintext highlighter-rouge">passed by reference</code>.</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">formatEmail</span><span class="p">(</span><span class="kt">ValueObject</span> <span class="nv">$valueObject</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$value</span> <span class="o">=</span> <span class="nv">$valueObject</span><span class="o">-&gt;</span><span class="nf">getValue</span><span class="p">();</span>
+    
+    <span class="c1">// do what you need with $value</span>
+    
+    <span class="k">return</span> <span class="k">new</span> <span class="nc">ValueObject</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Obviously, immutability saves as from the unexpected results at the end.</p>
+
+<h3 id="first-class-functions">First-Class Functions</h3>
+<p>This fancy phrase means that the functions like any other data type, such as numbers or strings.
+You can assign them to variables, pass them as arguments to other functions, and return them from functions.</p>
+
+<p>I bet you are familiar with this technique and using it on a daily basis. For example, collections:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$collection</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Collection</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+
+<span class="nv">$filtered</span> <span class="o">=</span> <span class="nv">$collection</span><span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$element</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$element</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">});</span> <span class="c1">// [2, 3]</span>
+</code></pre></div></div>
+<p>Collection::filter() accepts function as argument.</p>
+
+<p>Here is another example of how first-class functions could be useful:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sort</span><span class="p">(</span><span class="nf">ascend</span><span class="p">(</span><span class="nf">prop</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)),</span> <span class="p">[</span>
+     <span class="p">[</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Emma'</span><span class="p">,</span> <span class="s1">'age'</span> <span class="o">=&gt;</span> <span class="mi">70</span><span class="p">],</span>
+     <span class="p">[</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Peter'</span><span class="p">,</span> <span class="s1">'age'</span> <span class="o">=&gt;</span> <span class="mi">78</span><span class="p">],</span>
+     <span class="p">[</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Mikhail'</span><span class="p">,</span> <span class="s1">'age'</span> <span class="o">=&gt;</span> <span class="mi">62</span><span class="p">],</span>
+<span class="p">]);</span> <span class="c1">// [['name' =&gt; 'Mikhail', 'age' =&gt; 62], ['name' =&gt; 'Emma', 'age' =&gt; 70], ['name' =&gt; 'Peter', 'age' =&gt; 78]]</span>
+</code></pre></div></div>
+<p>First-class functions allow us to write more expressive code. Like this example: function <code class="language-plaintext highlighter-rouge">prop</code> returns a new 
+function that is passed to <code class="language-plaintext highlighter-rouge">ascend</code> that returns a new function that is passed to <code class="language-plaintext highlighter-rouge">sort</code>.</p>
+
+<h3 id="composition">Composition</h3>
+<p>We can build more complicated functions out of simpler ones.</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">plus1</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">power</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$value</span> <span class="o">*</span> <span class="nv">$value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nv">$powerPlus1</span> <span class="o">=</span> <span class="nf">compose</span><span class="p">(</span><span class="s1">'plus1'</span><span class="p">,</span> <span class="s1">'power'</span><span class="p">);</span>
+<span class="c1">// We created the new function $powerPlus1 that powers the value and that adds 1 to it.</span>
+
+<span class="nv">$powerPlus1</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span> <span class="c1">// 10</span>
+</code></pre></div></div>
+<p>Composition is like you are playing with Lego blocks. You can create a new, more complex structure based 
+on smaller bricks.</p>
+
+<h3 id="currying">Currying</h3>
+<p>Currying is the technique of translating a function that takes multiple arguments into a sequence of families of functions.</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">add</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">,</span> <span class="nv">$c</span><span class="p">)</span> <span class="p">{</span>
+     <span class="k">return</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span> <span class="o">+</span> <span class="nv">$c</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nv">$curryiedAdd</span> <span class="o">=</span> <span class="nf">curry</span><span class="p">(</span><span class="s1">'add'</span><span class="p">);</span>
+<span class="nv">$curryiedAdd</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span> <span class="c1">// 6</span>
+<span class="nv">$curryiedAdd</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="mi">2</span><span class="p">)(</span><span class="mi">3</span><span class="p">);</span> <span class="c1">// 6</span>
+<span class="nv">$curryiedAdd</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span> <span class="c1">// 6</span>
+<span class="nv">$curryiedAdd</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="mi">3</span><span class="p">);</span> <span class="c1">// 6</span>
+</code></pre></div></div>
+<p>Function <code class="language-plaintext highlighter-rouge">add</code> execution will be triggered when all three arguments are supplied. A new function will be returned 
+that expects the rest of the arguments in case not all arguments were provided.</p>
+
+<p>This allows us to write things like in the <code class="language-plaintext highlighter-rouge">First-Class Functions</code> section.</p>
+
+<h3 id="declarative-programming">Declarative Programming</h3>
+<p>Usually, you write your code in a way that you describe to the computer how you want to achieve results. 
+The declarative way allows you to write code in a way that you are talking to the computer about what you want 
+to achieve.</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$totalQty</span> <span class="o">=</span> <span class="nf">compose</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span> <span class="nf">pluck</span><span class="p">(</span><span class="s1">'qty'</span><span class="p">))([</span>
+    <span class="p">[</span>
+        <span class="s1">'description'</span> <span class="o">=&gt;</span> <span class="s1">'t-shirt'</span><span class="p">,</span>
+        <span class="s1">'qty'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">'value'</span> <span class="o">=&gt;</span> <span class="mi">20</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s1">'description'</span> <span class="o">=&gt;</span> <span class="s1">'jeans '</span><span class="p">,</span>
+        <span class="s1">'qty'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">'value'</span> <span class="o">=&gt;</span> <span class="mi">30</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s1">'description'</span> <span class="o">=&gt;</span> <span class="s1">' boots'</span><span class="p">,</span>
+        <span class="s1">'qty'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">'value'</span> <span class="o">=&gt;</span> <span class="mi">40</span>
+    <span class="p">]</span>
+<span class="p">]);</span>
+</code></pre></div></div>
+<p>You are telling your computer to <code class="language-plaintext highlighter-rouge">Take all 'qty' properties and sum them up</code>. You are not bothered by how to extract 
+property and how to sum up values.</p>
+
+<h3 id="but-all-these-small-functions-are-procedural-under-the-hood">But all these small functions are procedural under the hood!</h3>
+
+<p>Yes, you’re right. We are writing in PHP at the end. Functional code is just a higher-level abstraction. 
+At the core, all programs — even in languages like Haskell — reduce to procedural execution, because computers 
+are inherently procedural machines.</p>
+
+<p>The idea is that you are creating a lot of small, stateless Lego bricks. Then, using them, you can build more 
+and more complex functions. You don’t like the resulting structure? No problem! Just break it apart and create a 
+new one with the same bricks.</p>]]></content><author><name>Slava Basko</name></author><category term="php" /><category term="functional" /><summary type="html"><![CDATA[Let’s talk about PHP and functional programming. Why might it be a thing.]]></summary></entry><entry><title type="html">Specification Pattern</title><link href="/2025/03/02/specification-pattern.html" rel="alternate" type="text/html" title="Specification Pattern" /><published>2025-03-02T00:00:00+00:00</published><updated>2025-03-02T00:00:00+00:00</updated><id>/2025/03/02/specification-pattern</id><content type="html" xml:base="/2025/03/02/specification-pattern.html"><![CDATA[<p>Specification Pattern — what it’s about and why we should use it.</p>
+
+<p>Not so long ago, I joined a logistics project with quite a legacy codebase. 
+Eventually, we updated the project to PHP 7 and then to PHP 8. 
+That wasn’t a big deal since there were literally no dependencies.</p>
+
+<p>The real struggle was maintaining business rules.
+Basically, a lot of <code class="language-plaintext highlighter-rouge">if {} else {}</code> statements, lists, code duplication, etc.
+These rules weren’t fixed, some rules work fine today, but tomorrow conditions change, and we need to adjust the code.
+For example, today, the EU is one list of countries, but after Brexit, it’s another one.</p>
+
+<p>Things got even messier because we spoke with clients in different languages. 
+They called certain conditions/rules one way, and we called them another. 
+It was clear we needed a common language that both sides could understand.</p>
+
+<p>That’s when I remembered the beautiful and simple <strong>Specification Pattern</strong> — a perfect fit for our problem. 
+Plus, it’s super handy even between developers.</p>
+
+<h2 id="building-a-specification-library">Building a Specification Library</h2>
+
+<p>I wanted to introduce specifications, so I started looking for a good and simple PHP library. 
+Unfortunately, everything I found was either overengineered or didn’t meet our criteria — PHP 5.5 at the time, no dependencies.</p>
+
+<p>So, I built my own, focusing on simplicity, high composability, and avoiding fancy modern PHP features that wouldn’t 
+work on older PHP versions and didn’t bring much benefit anyway.</p>
+
+<p>👉 You can check it out on GitHub: <a href="https://github.com/slava-basko/specification-php">https://github.com/slava-basko/specification-php</a>.</p>
+
+<h2 id="why-use-specifications">Why Use Specifications?</h2>
+
+<p>At first, it might seem like overkill. But trust me, the value becomes clear over time.
+Take a simple example: <strong>Shipment goes to the UK</strong>.
+You could implement a <code class="language-plaintext highlighter-rouge">Shipment::toUK(): bool</code> method, but that quickly becomes messy. You’ll end up with a ton of helper methods cluttering your entity. A better approach is to encapsulate this logic in a specification:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">ShipmentToUk</span> <span class="kd">extends</span> <span class="nc">AbstractSpecification</span> <span class="p">{</span>
+    <span class="cd">/**
+     * @param Shipment $candidate
+     * @return bool
+     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isSatisfiedBy</span><span class="p">(</span><span class="nv">$candidate</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$candidate</span><span class="o">-&gt;</span><span class="nf">getDesctination</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'UK'</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>That worked for a while, but then the client said:</p>
+<blockquote>
+  <p>Well, we consider Jersey and the Isle of Man as part of the UK too.</p>
+</blockquote>
+
+<p>No problem! Just tweak the specification:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">ShipmentToUk</span> <span class="kd">extends</span> <span class="nc">AbstractSpecification</span> <span class="p">{</span>
+    <span class="cd">/**
+     * @param Shipment $candidate
+     * @return bool
+     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isSatisfiedBy</span><span class="p">(</span><span class="nv">$candidate</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">in_array</span><span class="p">(</span><span class="nv">$candidate</span><span class="o">-&gt;</span><span class="nf">getDestination</span><span class="p">(),</span> <span class="p">[</span><span class="s1">'UK'</span><span class="p">,</span> <span class="s1">'GB'</span><span class="p">,</span> <span class="s1">'JE'</span><span class="p">,</span> <span class="s1">'IM'</span><span class="p">]);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Boom! One small change, and it applies everywhere. 
+Plus, now everyone understands what <strong>Shipment goes to the UK</strong> actually means.</p>
+
+<h2 id="composing-specifications">Composing Specifications</h2>
+
+<p>Next, let’s introduce a <strong>High-value UK shipment</strong> specification.
+First, we define a <strong>High-value</strong> specification:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">HighValue</span> <span class="kd">extends</span> <span class="nc">AbstractSpecification</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="k">private</span> <span class="kt">CurrencyConverter</span> <span class="nv">$currencyConverter</span><span class="p">)</span> <span class="p">{}</span>
+
+    <span class="cd">/**
+     * @param Shipment $candidate
+     * @return bool
+     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isSatisfiedBy</span><span class="p">(</span><span class="nv">$candidate</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">currencyConverter</span><span class="o">-&gt;</span><span class="nf">toGBP</span><span class="p">(</span><span class="nv">$candidate</span><span class="o">-&gt;</span><span class="nf">getValue</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">300</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Then, we combine it with <strong>Shipment goes to the UK</strong>:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$highValueUkShipmentSpecification</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">AndSpecification</span><span class="p">([</span>
+    <span class="k">new</span> <span class="nc">ShipmentToUk</span><span class="p">(),</span>
+    <span class="k">new</span> <span class="nc">HighValue</span><span class="p">(</span><span class="k">new</span> <span class="nc">CurrencyConverter</span><span class="p">())</span>
+<span class="p">]);</span>
+</code></pre></div></div>
+
+<h2 id="the-real-benefit">The Real Benefit</h2>
+
+<p>Now, imagine your system is using these specifications everywhere, and the client suddenly says:</p>
+<blockquote>
+  <p>We noticed the system doesn’t recognize Guernsey as part of the UK. We need to fix this.</p>
+</blockquote>
+
+<p>No problem at all! You only need to update <strong>Shipment goes to the UK</strong>:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">return</span> <span class="nb">in_array</span><span class="p">(</span><span class="nv">$candidate</span><span class="o">-&gt;</span><span class="nf">getDestination</span><span class="p">(),</span> <span class="p">[</span><span class="s1">'UK'</span><span class="p">,</span> <span class="s1">'GB'</span><span class="p">,</span> <span class="s1">'JE'</span><span class="p">,</span> <span class="s1">'IM'</span><span class="p">,</span> <span class="s1">'GG'</span><span class="p">]);</span>
+</code></pre></div></div>
+<p>Done! Changes reflected on <strong>Shipment goes to the UK</strong> specification as well on <strong>High-value UK shipment</strong>.</p>
+
+<h2 id="final-thoughts">Final Thoughts</h2>
+
+<p>The Specification Pattern keeps business rules clean, encapsulated, and easy to adjust. 
+No more hunting for messy <code class="language-plaintext highlighter-rouge">if {} else {}</code> statements. 
+Just tweak the relevant spec, and the change propagates across the system.</p>
+
+<p>Give it a try — you’ll thank yourself later. 😎</p>]]></content><author><name>Slava Basko</name></author><category term="php" /><category term="specification" /><summary type="html"><![CDATA[Specification Pattern — what it’s about and why we should use it.]]></summary></entry></feed>
